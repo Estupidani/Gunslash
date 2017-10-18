@@ -3,8 +3,12 @@ using System.Collections;
 
 public class CharacterControl : MonoBehaviour {
 	public float speed;
+	public float projectileSpeed;
 	public float jumpSpeed;
 	private bool inTheAir;
+	public GameObject projectile;
+	public float fireRate;
+	private float nextFire;
 
 
 	void Update(){
@@ -20,6 +24,15 @@ public class CharacterControl : MonoBehaviour {
 		}
 		Vector2 movement = new Vector2 (playerRigidBody.velocity.x, playerRigidBody.velocity.y+moveVertical);
 		playerRigidBody.velocity = movement;
+		if (Input.GetButton ("Fire1") && Time.time > nextFire) {
+			nextFire = Time.time + fireRate;
+			Vector2 target = Camera.main.ScreenToWorldPoint( new Vector3 (Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+			Vector2 myPos = new Vector2(transform.position.x,transform.position.y);
+			Vector2 direction = target - myPos;
+			direction.Normalize();
+			GameObject bullet = (GameObject)Instantiate( projectile, myPos, Quaternion.identity);
+			bullet.GetComponent<Rigidbody2D>().velocity = direction * projectileSpeed;
+		}
 	}
 	void FixedUpdate(){
 		float moveHorizontal = Input.GetAxis("Horizontal");

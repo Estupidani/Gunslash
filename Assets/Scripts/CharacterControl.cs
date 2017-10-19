@@ -1,21 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public class Boundary{
+	public float xMin, xMax, yMin, yMax;
+}
+
 public class CharacterControl : MonoBehaviour {
 	public float speed;
 	public float projectileSpeed;
 	public float jumpSpeed;
-	private bool inTheAir;
 	public GameObject projectile;
 	public float fireRate;
+	public Boundary boundary;
+
+	private bool inTheAir;
 	private float nextFire;
+	private Rigidbody2D playerRigidBody;
 
-
+	void Start(){
+		playerRigidBody=this.gameObject.GetComponent<Rigidbody2D>();
+	}
 	void Update(){
 		Transform playerTransform = this.gameObject.transform;
-		Rigidbody2D playerRigidBody=this.gameObject.GetComponent<Rigidbody2D>();
-		playerTransform.rotation = new Quaternion (0, 0, 0, 0);
-		if (playerRigidBody.velocity.y <= 0) 
+		if (playerRigidBody.velocity.y == 0) 
 			inTheAir = false;
 		float moveVertical = 0;
 		if (Input.GetKeyDown (KeyCode.Space) && !inTheAir) {
@@ -36,8 +43,13 @@ public class CharacterControl : MonoBehaviour {
 	}
 	void FixedUpdate(){
 		float moveHorizontal = Input.GetAxis("Horizontal");
-		Rigidbody2D playerRigidBody=this.gameObject.GetComponent<Rigidbody2D>();
 		Vector2 movement = new Vector2 (moveHorizontal * speed, playerRigidBody.velocity.y);
 		playerRigidBody.velocity = movement;
+	}
+
+	void CheckBoundaries(){
+		playerRigidBody.position = new Vector2 (
+			Mathf.Clamp (playerRigidBody.position.x, boundary.xMin, boundary.xMax),
+			Mathf.Clamp (playerRigidBody.position.y, boundary.yMin, boundary.yMax));
 	}
 }

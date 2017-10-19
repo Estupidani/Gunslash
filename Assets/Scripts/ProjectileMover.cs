@@ -8,4 +8,11 @@ public class ProjectileMover : MonoBehaviour {
 	void Start () {
 		projectileRigidBody = this.gameObject.GetComponent<Rigidbody2D> ();
 	}
+
+	void OnCollisionEnter2D(Collision2D other){
+		//if(!other.collider.gameObject.CompareTag("Player")){
+			Time.timeScale = 0.1f;
+			Destroy(gameObject);
+		//}
+	}
 }

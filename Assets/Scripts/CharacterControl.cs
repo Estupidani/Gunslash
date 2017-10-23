@@ -12,18 +12,20 @@ public class CharacterControl : MonoBehaviour {
 	public float jumpSpeed;
 	public GameObject projectile;
 	public float fireRate;
+	public float meleeRate;
 	public Boundary boundary;
 	public SwingAnimator attack;
 
 	private bool inTheAir;
 	private float nextFire;
+	private float nextMelee;
 	private Rigidbody2D playerRigidBody;
 
 	void Start(){
 		playerRigidBody=this.gameObject.GetComponent<Rigidbody2D>();
 	}
+
 	void Update(){
-		Transform playerTransform = this.gameObject.transform;
 		if (playerRigidBody.velocity.y == 0)
 			inTheAir = false;
 		else
@@ -35,6 +37,7 @@ public class CharacterControl : MonoBehaviour {
 		FireProjectile ();
 		MeleeAttack ();
 	}
+
 	void FixedUpdate(){
 		float moveHorizontal = Input.GetAxis("Horizontal");
 		Vector2 movement = new Vector2 (moveHorizontal * speed, playerRigidBody.velocity.y);
@@ -69,9 +72,10 @@ public class CharacterControl : MonoBehaviour {
 	}
 
 	void MeleeAttack(){
-		if (Input.GetButton("Fire1"))
+		if (Input.GetButtonDown ("Fire1") && Time.time > nextMelee) {
+			nextMelee = Time.time + meleeRate;
 			attack.isAttacking = true;
-		else
+		} else
 			attack.isAttacking = false;
 	}
 }

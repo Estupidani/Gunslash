@@ -53,7 +53,6 @@ public class EnemyBehaviour : MonoBehaviour {
 
 	void Attack(){
 		timeAttack = Time.time;
-		Vector2 auxMovement = new Vector2 (moveHorizontal, moveVertical);
 		isAttacking = true;
 		enemyRigidBody.velocity = new  Vector2 (0f, 0f);
 	}

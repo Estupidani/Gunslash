@@ -6,6 +6,7 @@ public class CrosshairControl : MonoBehaviour {
 	private SpriteRenderer crosshairRenderer;
 	public Sprite availableCrosshair;
 	public Sprite unavailableCrosshair;
+	public CharacterControl character;
 
 	void Start(){ //Starts the cursor confined to the player's view and attaches the available crosshair sprite
 		Cursor.lockState = CursorLockMode.Confined;
@@ -15,10 +16,10 @@ public class CrosshairControl : MonoBehaviour {
 	}
 
 	void Update(){
-		if (Input.GetButton("Fire1")) {
-			crosshairRenderer.sprite = unavailableCrosshair;
-		} else
+		if (character.ammo > 0) {
 			crosshairRenderer.sprite = availableCrosshair;
+		} else
+			crosshairRenderer.sprite = unavailableCrosshair;
 	}
 
 	void OnGUI()

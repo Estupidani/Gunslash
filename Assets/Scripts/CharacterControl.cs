@@ -14,15 +14,17 @@ public class CharacterControl : MonoBehaviour {
 	public float fireRate;
 	public float meleeRate;
 	public Boundary boundary;
-	public SwingAnimator attack;
+	public int ammo;
 
 	private bool inTheAir;
 	private float nextFire;
 	private float nextMelee;
 	private Rigidbody2D playerRigidBody;
+	private bool isAttacking;
 
 	void Start(){
 		playerRigidBody=this.gameObject.GetComponent<Rigidbody2D>();
+		isAttacking = false;
 	}
 
 	void Update(){
@@ -60,7 +62,7 @@ public class CharacterControl : MonoBehaviour {
 	}
 
 	void FireProjectile(){ //Fires a projectile if the player has pressed the fire button. If they have, the player shoots in the direction of the crosshair
-		if (Input.GetButton ("Fire1") && Time.time > nextFire) {//If the button is pressed and rateOfFire time has passed since the last shot
+		if (Input.GetButton ("Fire1") && ammo > 0 && Time.time > nextFire) {//If the button is pressed and rateOfFire time has passed since the last shot
 			nextFire = Time.time + fireRate;
 			Vector2 target = Camera.main.ScreenToWorldPoint( new Vector3 (Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane)); //Translates mouse position to world coordinates
 			Vector2 myPos = new Vector2(transform.position.x,transform.position.y);
@@ -68,14 +70,19 @@ public class CharacterControl : MonoBehaviour {
 			direction.Normalize();
 			GameObject energyBall = (GameObject)Instantiate( projectile, myPos, Quaternion.identity); //Fires the energyBall with no rotation from the player position
 			energyBall.GetComponent<Rigidbody2D>().velocity = direction * projectileSpeed;
+			ammo--;
 		}
 	}
 
 	void MeleeAttack(){
-		if (Input.GetButtonDown ("Fire1") && Time.time > nextMelee) {
+		if (Input.GetButtonDown ("Fire2") && Time.time > nextMelee) {
 			nextMelee = Time.time + meleeRate;
-			attack.isAttacking = true;
+			isAttacking = true;
 		} else
-			attack.isAttacking = false;
+			isAttacking = false;
+	}
+
+	public bool getIsAttacking(){
+		return isAttacking;
 	}
 }

@@ -6,6 +6,8 @@ public class EnemyBehaviour : MonoBehaviour {
 	public float jumpSpeed;
 	public Boundary boundary;
 	public float attackLength;
+	public int lifePoints;
+	public CharacterControl character;
 
 	private Rigidbody2D enemyRigidBody;
 	private float moveHorizontal;
@@ -21,6 +23,8 @@ public class EnemyBehaviour : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (lifePoints <= 0)
+			Destroy (this.gameObject);
 		if (enemyRigidBody.IsSleeping () && !isAttacking) {
 			moveHorizontal = -moveHorizontal;
 			moveVertical = jumpSpeed;
@@ -35,8 +39,17 @@ public class EnemyBehaviour : MonoBehaviour {
 			moveHorizontal = -moveHorizontal;
 		if (other.CompareTag ("JumpBoundaryFromLeft") && enemyRigidBody.velocity.x > 0f)
 			moveVertical = jumpSpeed;
-		if(other.CompareTag("JumpBoundaryFromRight") && enemyRigidBody.velocity.x < 0f )
-			moveVertical = jumpSpeed;
+		else
+			if(other.CompareTag("JumpBoundaryFromRight") && enemyRigidBody.velocity.x < 0f )
+				moveVertical = jumpSpeed;
+		if (other.CompareTag ("Projectile")) {
+			lifePoints--;
+			Destroy (other.gameObject);
+		}
+		if (other.CompareTag ("Melee")) {
+			lifePoints--;
+			character.ammo++;
+		}
 	}
 
 	void OnTriggerStay2D(Collider2D other){

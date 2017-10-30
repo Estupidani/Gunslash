@@ -15,6 +15,7 @@ public class CharacterControl : MonoBehaviour {
 	public float meleeRate;
 	public Boundary boundary;
 	public int ammo;
+	public int lifePoints;
 
 	private bool inTheAir;
 	private float nextFire;
@@ -28,6 +29,8 @@ public class CharacterControl : MonoBehaviour {
 	}
 
 	void Update(){
+		if (lifePoints <= 0)
+			Destroy (this.gameObject);
 		if (playerRigidBody.velocity.y == 0)
 			inTheAir = false;
 		else
@@ -47,6 +50,10 @@ public class CharacterControl : MonoBehaviour {
 		CheckBoundaries ();
 	}
 
+	void OnTriggerEnter2D(Collider2D other){
+		if(other.CompareTag("EnemyAttack"))
+			lifePoints--;
+	}
 	void CheckBoundaries(){ //Checks wether the character is out of bounds. If it is, prevents it from going further
 		playerRigidBody.position = new Vector2 (
 			Mathf.Clamp (playerRigidBody.position.x, boundary.xMin, boundary.xMax),

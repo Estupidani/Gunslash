@@ -10,17 +10,22 @@ public class EnemyBehaviour : MonoBehaviour {
 	public CharacterControl character;
 	public GameController controller;
 	public GameObject attackHitBox;
+	public float hitRate;
 
 	private Rigidbody2D enemyRigidBody;
 	private float moveHorizontal;
 	private float moveVertical;
 	private bool isAttacking;
-	private float timeAttack;
 	private float nextAttack;
 	private bool enemyType;
 	private bool firstAttack;
+	private float nextHit;
 
 	void Start () {
+		GameObject characterGameObject = GameObject.FindWithTag ("Player");
+		GameObject controllerGameObject = GameObject.FindWithTag ("GameController");
+		character = characterGameObject.GetComponent<CharacterControl> ();
+		controller = controllerGameObject.GetComponent<GameController> ();
 		isAttacking = false;
 		enemyRigidBody = this.gameObject.GetComponent<Rigidbody2D> ();
 		enemyType = GameController.EnemyType ();
@@ -41,10 +46,6 @@ public class EnemyBehaviour : MonoBehaviour {
 		CheckBoundaries ();
 		if (isAttacking)
 			Attack ();
-		if (isAttacking && Time.time > timeAttack + attackLength) {
-			firstAttack = true;
-			isAttacking = false;
-		}
 	}
 
 	void OnTriggerEnter2D(Collider2D other){
@@ -60,15 +61,19 @@ public class EnemyBehaviour : MonoBehaviour {
 		else
 			if (other.CompareTag ("JumpBoundaryFromRightUpper") && enemyRigidBody.velocity.x < 0f && enemyType)
 				moveVertical = jumpSpeed;
-		if (other.CompareTag ("Projectile")) {
+		if (other.CompareTag ("Projectile") && Time.time>nextHit) {
+			nextHit = Time.time + hitRate;
 			lifePoints--;
 			Destroy (other.gameObject);
 			controller.FreezeFrame ();
 		}
-		if (other.CompareTag ("Melee")) {
+		if (other.CompareTag ("Melee") && Time.time > nextHit) {
+			nextHit = Time.time + hitRate;
 			lifePoints--;
 			character.ammo++;
 		}
+		if (other.CompareTag ("PlayerInteractHitbox"))
+			firstAttack = true;
 	}
 
 	void OnTriggerStay2D(Collider2D other){
@@ -91,8 +96,6 @@ public class EnemyBehaviour : MonoBehaviour {
 	}
 
 	void Attack(){
-		timeAttack = Time.time;
-		enemyRigidBody.velocity = Vector2.zero;
 		if (Time.time > nextAttack) {
 			nextAttack = Time.time + attackLength;
 			if (!firstAttack) //delays the first attack to avoid instant hit*/

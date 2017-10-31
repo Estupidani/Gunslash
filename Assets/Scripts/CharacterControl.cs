@@ -16,7 +16,9 @@ public class CharacterControl : MonoBehaviour {
 	public Boundary boundary;
 	public int ammo;
 	public int lifePoints;
+	public float hitRate;
 
+	private float nextHit;
 	private bool inTheAir;
 	private float nextFire;
 	private float nextMelee;
@@ -51,8 +53,10 @@ public class CharacterControl : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D(Collider2D other){
-		if(other.CompareTag("EnemyAttack"))
+		if (other.CompareTag ("EnemyAttack") && Time.time > nextHit) { //Prevents the player from taking a lot of hits at the same time
+			nextHit = Time.time + hitRate;
 			lifePoints--;
+		}
 	}
 	void CheckBoundaries(){ //Checks wether the character is out of bounds. If it is, prevents it from going further
 		playerRigidBody.position = new Vector2 (

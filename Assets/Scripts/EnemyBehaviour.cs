@@ -10,6 +10,7 @@ public class EnemyBehaviour : MonoBehaviour {
 	public CharacterControl character;
 	public GameController controller;
 	public GameObject attackHitBox;
+	public GameObject attackWindUp;
 	public float hitRate;
 
 	private Rigidbody2D enemyRigidBody;
@@ -20,9 +21,12 @@ public class EnemyBehaviour : MonoBehaviour {
 	private bool enemyType;
 	private bool firstAttack;
 	private float nextHit;
+	//private Animator attackWindUp;
 
 	void Start () {
 		attackHitBox.SetActive (false);
+		attackWindUp.SetActive (false);
+		//attackWindUp = this.GetComponent<Animator> ();
 		GameObject characterGameObject = GameObject.FindWithTag ("Player");
 		GameObject controllerGameObject = GameObject.FindWithTag ("GameController");
 		character = characterGameObject.GetComponent<CharacterControl> ();
@@ -85,6 +89,7 @@ public class EnemyBehaviour : MonoBehaviour {
 	void OnTriggerExit2D(Collider2D other){
 		if (other.CompareTag ("PlayerInteractHitbox"))
 			isAttacking = false;
+		attackWindUp.SetActive (false);
 	}
 		
 	void FixedUpdate(){
@@ -99,8 +104,11 @@ public class EnemyBehaviour : MonoBehaviour {
 	void Attack(){
 		if (Time.time > nextAttack) {
 			nextAttack = Time.time + attackLength;
-			if (!firstAttack) //delays the first attack to avoid instant hit*/
-				attackHitBox.SetActive(true);
+			if (!firstAttack) { //delays the first attack to avoid instant hit*/
+				attackHitBox.SetActive (true);
+				attackWindUp.SetActive (false);
+			} else
+				attackWindUp.SetActive (true);
 			firstAttack = false;
 		} else {
 			attackHitBox.SetActive(false);

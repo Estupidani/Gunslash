@@ -22,6 +22,7 @@ public class EnemyBehaviour : MonoBehaviour {
 	private float nextHit;
 
 	void Start () {
+		attackHitBox.SetActive (false);
 		GameObject characterGameObject = GameObject.FindWithTag ("Player");
 		GameObject controllerGameObject = GameObject.FindWithTag ("GameController");
 		character = characterGameObject.GetComponent<CharacterControl> ();
@@ -99,10 +100,10 @@ public class EnemyBehaviour : MonoBehaviour {
 		if (Time.time > nextAttack) {
 			nextAttack = Time.time + attackLength;
 			if (!firstAttack) //delays the first attack to avoid instant hit*/
-				attackHitBox.GetComponent<CircleCollider2D> ().radius = 6.5f;
+				attackHitBox.SetActive(true);
 			firstAttack = false;
 		} else {
-			attackHitBox.GetComponent<CircleCollider2D> ().radius = 1f;
+			attackHitBox.SetActive(false);
 		}
 	}
 

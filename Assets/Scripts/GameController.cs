@@ -11,20 +11,30 @@ public class GameController : MonoBehaviour {
 	public int enemyCount;
 	public Vector2 spawnValues;
 	public GameObject enemy;
+	public AudioClip introClip;
+	public AudioClip combatClip;
 
 	private bool gameOver;
 	private int freezeFrame;
+	private float waveWait;
+	private AudioSource music;
+	private GameObject[] enemiesOnScreen;
 
 	private static bool enemyType;
 
 	void Start () {
+		music = this.GetComponent<AudioSource> ();
+		music.clip = introClip;
+		music.loop = true;
+		music.Play ();
 		freezeFrame = framesFrozen;
-		StartCoroutine( SpawnWaves ());
+		waveWait = 0.5f;
 		shots.color = Color.green;
 		enemyType = false;
 	}
 
 	void Update () {
+		enemiesOnScreen = GameObject.FindGameObjectsWithTag ("Enemy");
 		shots.text = "AMMO:" + character.ammo.ToString();
 		lifePoints.text = "LIFE:" + character.lifePoints.ToString();
 		if (character.ammo == 0)
@@ -50,16 +60,22 @@ public class GameController : MonoBehaviour {
 		return enemyType;
 	}
 
+	public void startGame(){
+		music.clip = combatClip;
+		music.Play ();
+		StartCoroutine( SpawnWaves ());		
+	}
+
 	IEnumerator SpawnWaves(){
-		yield return new WaitForSeconds (spawnWait);
 		while (!gameOver) {
 			for (int i = 0; i < enemyCount; i++) {
-				if (i > 10)
-					lifePoints.text = "PUES SI ABER QUE PASA";
 				Vector2 spawnPosition = new Vector2 (spawnValues.x, spawnValues.y);
 				Instantiate (enemy, spawnPosition, Quaternion.identity);
+				yield return new WaitForSeconds (waveWait);
 			}
-			yield return new WaitForSeconds (spawnWait);
+			yield return new WaitForSeconds ( spawnWait);
+			spawnWait *= 2;
+			enemyCount += (int) Mathf.Ceil (enemyCount * 0.5f);
 		}
 	}
 }

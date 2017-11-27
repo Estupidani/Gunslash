@@ -4,38 +4,20 @@ using System.Collections;
 public class CrosshairControl : MonoBehaviour {
 	private Transform crosshairTransform;
 	private SpriteRenderer crosshairRenderer;
-	public Sprite availableCrosshair;
-	public Sprite unavailableCrosshair;
 	public CharacterControl character;
+	public Texture2D crossHairAvailable;
+	public Texture2D crossHairUnavailable;
 
 	void Start(){ //Starts the cursor confined to the player's view and attaches the available crosshair sprite
 		Cursor.lockState = CursorLockMode.Confined;
-		crosshairTransform = this.gameObject.transform;
-		crosshairRenderer = this.gameObject.GetComponent<SpriteRenderer> ();
-		crosshairRenderer.sprite = availableCrosshair;
+		Cursor.SetCursor (crossHairAvailable, Vector2.zero, CursorMode.ForceSoftware);
 	}
 
 	void Update(){
 		if (character.ammo > 0) {
-			crosshairRenderer.sprite = availableCrosshair;
+			Cursor.SetCursor(crossHairAvailable,Vector2.zero,CursorMode.Auto);
 		} else
-			crosshairRenderer.sprite = unavailableCrosshair;
+			Cursor.SetCursor(crossHairUnavailable,Vector2.zero,CursorMode.ForceSoftware);
 	}
-
-	void OnGUI()
-	{
-		Vector3 p = new Vector3 ();
-		Camera c = Camera.main;
-		Event e = Event.current;
-		Vector2 mousePos = new Vector2 ();
-
-		// Get the mouse position from Event.
-		// Note that the y position from Event is inverted.
-		mousePos.x = e.mousePosition.x;
-		mousePos.y = c.pixelHeight - e.mousePosition.y;
-
-		p = c.ScreenToWorldPoint (new Vector3 (mousePos.x, mousePos.y, c.nearClipPlane));
-		crosshairTransform.position = p;
-	}
-
+		
 }

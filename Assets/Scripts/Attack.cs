@@ -20,7 +20,7 @@ public class Attack : MonoBehaviour {
 			this.gameObject.transform.localPosition = new Vector3 (-4.2f, 0.1f, 0f);
 		} else if (Time.time >= nextMelee) {
 			this.gameObject.transform.localScale = new Vector3 (0.01f, 0.01f, 0.01f);
-			this.gameObject.transform.localPosition = Vector3.zero;
+			this.gameObject.transform.position = new Vector3(0f,0f,0f);
 		}
 	}
 }

@@ -7,18 +7,23 @@ public class GameController : MonoBehaviour {
 	public CharacterControl character;
 	public Text shots;
 	public Text lifePoints;
+	public Text restartText;
+	public Text roundText;
 	public float spawnWait;
 	public int enemyCount;
 	public Vector2 spawnValues;
 	public GameObject enemy;
 	public AudioClip introClip;
 	public AudioClip combatClip;
+	public bool isPlaying;
 
 	private bool gameOver;
+	private int roundNumber;
 	private int freezeFrame;
 	private float waveWait;
 	private AudioSource music;
 	private GameObject[] enemiesOnScreen;
+	private bool restart;
 
 	private static bool enemyType;
 
@@ -29,13 +34,33 @@ public class GameController : MonoBehaviour {
 		music.Play ();
 		freezeFrame = framesFrozen;
 		waveWait = 0.5f;
+		roundNumber = 0;
 		shots.color = Color.green;
 		enemyType = false;
+		isPlaying = false;
+		restart = false;
+		restartText.text = "";
+		roundText.text = "ROUND";
+		roundNumber = 0;
 	}
 
 	void Update () {
+		if (gameOver) {
+			restartText.text = "Press R to restart or ESC to exit";
+			restart = true;
+		}
+		if (restart) {
+			if (Input.GetKeyDown (KeyCode.R))
+				Application.LoadLevel (Application.loadedLevel);
+			else if (Input.GetKeyDown (KeyCode.Escape))
+				Application.Quit ();
+		}
+			
 		enemiesOnScreen = GameObject.FindGameObjectsWithTag ("Enemy");
-		shots.text = "AMMO:" + character.ammo.ToString();
+		if (isPlaying)
+			shots.text = "AMMO:" + character.ammo.ToString ();
+		else
+			shots.text = "AMMO:-";
 		lifePoints.text = "LIFE:" + character.lifePoints.ToString();
 		if (character.ammo == 0)
 			shots.color = Color.red;
@@ -43,7 +68,7 @@ public class GameController : MonoBehaviour {
 			shots.color = Color.green;
 		Time.timeScale = 1f;
 		if (freezeFrame < framesFrozen) {
-			Time.timeScale = 0.01f;
+			Time.timeScale = 0.3f;
 			freezeFrame++;
 		} else
 			Time.timeScale = 1f;
@@ -67,15 +92,19 @@ public class GameController : MonoBehaviour {
 	}
 
 	IEnumerator SpawnWaves(){
+		isPlaying = true;
+		character.ammo = 0;
 		while (!gameOver) {
+			roundNumber += 1;
+			roundText.text = roundNumber.ToString ();
 			for (int i = 0; i < enemyCount; i++) {
 				Vector2 spawnPosition = new Vector2 (spawnValues.x, spawnValues.y);
 				Instantiate (enemy, spawnPosition, Quaternion.identity);
 				yield return new WaitForSeconds (waveWait);
 			}
-			yield return new WaitForSeconds ( spawnWait);
-			spawnWait *= 2;
-			enemyCount += (int) Mathf.Ceil (enemyCount * 0.5f);
+			yield return new WaitUntil( ()=>enemiesOnScreen.Length==0);
+			yield return new WaitForSeconds (spawnWait);
+			enemyCount += (int) Mathf.Ceil (enemyCount * 0.2f);
 		}
 	}
 }

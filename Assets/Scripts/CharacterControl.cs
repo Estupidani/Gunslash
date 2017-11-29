@@ -17,6 +17,9 @@ public class CharacterControl : MonoBehaviour {
 	public int ammo;
 	public int lifePoints;
 	public float hitRate;
+	public GameController gameController;
+	public Sprite character;
+	public Sprite characterHurt;
 
 	private float nextHit;
 	private bool inTheAir;
@@ -24,19 +27,25 @@ public class CharacterControl : MonoBehaviour {
 	private float nextMelee;
 	private Rigidbody2D playerRigidBody;
 	private bool isAttacking;
+	private SpriteRenderer renderer;
 
 	void Start(){
 		playerRigidBody=this.gameObject.GetComponent<Rigidbody2D>();
+		renderer = this.gameObject.GetComponent<SpriteRenderer> ();
 		isAttacking = false;
 	}
 
 	void Update(){
+		if (!gameController.isPlaying && ammo==0) //if the game hasn't started, the player has infinite ammo to prevent a soft lock
+			this.ammo++;
 		if (lifePoints <= 0)
 			Destroy (this.gameObject);
 		if (playerRigidBody.velocity.y == 0)
 			inTheAir = false;
 		else
 			inTheAir = true;
+		if (Time.time > nextHit)
+			renderer.sprite = character;
 		float moveVertical = CheckJump();
 		Vector2 movement = new Vector2 (playerRigidBody.velocity.x, playerRigidBody.velocity.y+moveVertical);
 		playerRigidBody.velocity = movement;
@@ -55,6 +64,7 @@ public class CharacterControl : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other){
 		if (other.CompareTag ("EnemyAttack") && Time.time > nextHit) { //Prevents the player from taking a lot of hits at the same time
 			nextHit = Time.time + hitRate;
+			renderer.sprite = characterHurt;
 			lifePoints--;
 		}
 	}

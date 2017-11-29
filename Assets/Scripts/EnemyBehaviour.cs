@@ -7,8 +7,6 @@ public class EnemyBehaviour : MonoBehaviour {
 	public Boundary boundary;
 	public float attackLength;
 	public int lifePoints;
-	public CharacterControl character;
-	public GameController controller;
 	public GameObject attackHitBox;
 	public GameObject attackWindUp;
 	public float hitRate;
@@ -21,12 +19,14 @@ public class EnemyBehaviour : MonoBehaviour {
 	private bool enemyType;
 	private bool firstAttack;
 	private float nextHit;
-	//private Animator attackWindUp;
+	private CharacterControl character;
+	private GameController controller;
+	private AudioSource audio;
 
 	void Start () {
+		audio = this.GetComponent<AudioSource> ();
 		attackHitBox.SetActive (false);
 		attackWindUp.SetActive (false);
-		//attackWindUp = this.GetComponent<Animator> ();
 		GameObject characterGameObject = GameObject.FindWithTag ("Player");
 		GameObject controllerGameObject = GameObject.FindWithTag ("GameController");
 		character = characterGameObject.GetComponent<CharacterControl> ();
@@ -70,15 +70,19 @@ public class EnemyBehaviour : MonoBehaviour {
 			nextHit = Time.time + hitRate;
 			lifePoints--;
 			Destroy (other.gameObject);
-			controller.FreezeFrame ();
+			if(this.lifePoints == 0)
+				controller.FreezeFrame ();
 		}
 		if (other.CompareTag ("Melee") && Time.time > nextHit) {
 			nextHit = Time.time + hitRate;
 			lifePoints--;
-			character.ammo++;
+			if(character.ammo <= 9)
+				character.ammo++;
 		}
-		if (other.CompareTag ("PlayerInteractHitbox"))
+		if (other.CompareTag ("PlayerInteractHitbox")) {
+			audio.Play ();
 			firstAttack = true;
+		}
 	}
 
 	void OnTriggerStay2D(Collider2D other){
@@ -105,6 +109,7 @@ public class EnemyBehaviour : MonoBehaviour {
 		if (Time.time > nextAttack) {
 			nextAttack = Time.time + attackLength;
 			if (!firstAttack) { //delays the first attack to avoid instant hit*/
+				audio.PlayDelayed(0.03f);
 				attackHitBox.SetActive (true);
 				attackWindUp.SetActive (false);
 			} else

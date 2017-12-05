@@ -21,10 +21,13 @@ public class EnemyBehaviour : MonoBehaviour {
 	private float nextHit;
 	private CharacterControl character;
 	private GameController controller;
-	private AudioSource audio;
+	private AudioSource enemyHit;
+	private AudioSource enemyAttack;
 
 	void Start () {
-		audio = this.GetComponent<AudioSource> ();
+		AudioSource[] audios = this.GetComponents<AudioSource> ();
+		enemyHit = audios [0];
+		enemyAttack = audios [1];
 		attackHitBox.SetActive (false);
 		attackWindUp.SetActive (false);
 		GameObject characterGameObject = GameObject.FindWithTag ("Player");
@@ -76,11 +79,14 @@ public class EnemyBehaviour : MonoBehaviour {
 		if (other.CompareTag ("Melee") && Time.time > nextHit) {
 			nextHit = Time.time + hitRate;
 			lifePoints--;
+			enemyHit.Play ();
 			if(character.ammo <= 9)
 				character.ammo++;
+			if(this.lifePoints == 0)
+				controller.FreezeFrame ();
 		}
 		if (other.CompareTag ("PlayerInteractHitbox")) {
-			audio.Play ();
+			enemyAttack.Play ();
 			firstAttack = true;
 		}
 	}
@@ -109,7 +115,7 @@ public class EnemyBehaviour : MonoBehaviour {
 		if (Time.time > nextAttack) {
 			nextAttack = Time.time + attackLength;
 			if (!firstAttack) { //delays the first attack to avoid instant hit*/
-				audio.PlayDelayed(0.03f);
+				enemyAttack.PlayDelayed(0.03f);
 				attackHitBox.SetActive (true);
 				attackWindUp.SetActive (false);
 			} else
